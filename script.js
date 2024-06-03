@@ -95,6 +95,7 @@ const monsters = [
 const button1 = document.querySelector("#button1");
 const button2 = document.querySelector("#button2");
 const button3 = document.querySelector("#button3");
+const inventoryButton = document.querySelector("#inventory");
 const text = document.querySelector("#text");
 const xpText = document.querySelector("#xpText");
 const healthText = document.querySelector("#healthText");
@@ -106,6 +107,7 @@ const monsterHealthText = document.querySelector("#monsterHealth");
 button1.onclick = goStore;
 button2.onclick = goCave;
 button3.onclick = fightDragon;
+inventoryButton.onclick = openInventory;
 
 function update(location) {
   text.innerText = location.text;
@@ -116,6 +118,21 @@ function update(location) {
   button2.onclick = location["button functions"][1];
   button3.onclick = location["button functions"][2];
 }
+
+function openInventory() {
+  tempText = text.innerText;
+  text.innerText = inventory;
+  inventoryButton.innerText = "Back to menu";
+  document.querySelector("#controls").style.display = "none";
+  inventoryButton.onclick = closeInventory;
+};
+
+function closeInventory() {
+  text.innerText = tempText;
+  inventoryButton.innerText = "Inventory"
+  document.querySelector("#controls").style.display = "block";
+  inventoryButton.onclick = openInventory;
+};
 
 function goStore() {
   update(locations[1]);

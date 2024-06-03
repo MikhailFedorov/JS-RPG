@@ -17,7 +17,7 @@ body {
   padding: 10px;
 }
 
-#controls {
+#controls, #inventory {
   border: 1px black solid;
   padding: 5px;
 }
