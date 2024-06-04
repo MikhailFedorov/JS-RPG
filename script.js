@@ -1,57 +1,99 @@
 let xp = 0;
 let health = 100;
+let maxHealth = 100;
 let gold = 50;
 let currentWeapon = 0;
 let fighting;
 let monsterHealth;
 let inventory = ["stick"];
-const locations = [
+let flatterFlag = false;
+let roomCost = 50;
+let campFlag = false;
+let askFlag = false;
+
+const locations1 = [
   {
+    id: 0,
     name: "town square",
-    "button text": ["Go to store", "Go to cave", "Fight dragon"],
-    "button functions": [goStore, goCave, fightDragon],
+    "button text": ["Go to store", "Go to inn", "Explore"],
+    "button functions": [goStore, goInn, explore],
     text: "You are in the Town square."
   },
   {
+    id: 1,
     name: "store",
     "button text": ["Buy health (10 gold)", "Buy weapon (30 gold)", "Go to Town square"],
     "button functions": [buyHealth, buyWeapon, goTown],
     text: "You are in the store."
   },
   {
+    id: 2,
     name: "cave",
-    "button text": ["Fight slime", "Fight beast", "Go to Town square"],
+    "button text": ["Fight slime", "Fight goblin", "Go to Town square"],
     "button functions": [fightSlime, fightBeast, goTown],
-    text: "You enter the cave. You see a slime squelching near you and a beast lurking in the dark."
+    text: "You enter the cave. You can hear squelching noises in the dark. After approaching it you notice a slime. You can see bones floating in his translucent body. They probably belong to an unfortunate villager who decided to explore the cave. With the corner of your eye you see a dark figure in the shadows. It is a goblin who fell asleep. Maybe you can beat some information about the base out of him? "
   },
   {
+    id: 3,
     name: "fight",
     "button text": ["Attack", "Dodge", "Run"],
     "button functions": [attack, dodge, goTown],
     text: "You have started a fight."
   },
   {
+    id: 4,
     name: "defeatMonster",
     "button text": ["Go to town square", "Go to town square", "Go to town square"],
     "button functions": [goTown, goTown, easterEgg],
   },
   {
+    id: 5,
     name: "victory",
     "button text": ["NG+", "NG+", "NG+"],
     "button functions": [goTown, goTown, goTown],
     text: "You have won the game!!!"
   },
   {
+    id: 6,
     name: "lose",
     "button text": ["Restart", "Restart", "Restart"],
     "button functions": [restart, restart, restart],
     text: "You died."
   },
   {
+    id: 7,
     name: "easterEgg",
     "button text": ["Pick 2", "Pick 8", "Go to Town square"],
     "button functions": [pickTwo, pickEight, goTown],
     text: "You find a secret game. Pick a number above. Ten numbers will be randomly chosen between 0 and 10. If the number you choose matches one of the random numbers, you win!"
+  },
+  {
+    id: 8,
+    name: "town square start",
+    "button text": ["Go to store", "Go to inn"],
+    "button functions": [goStore, goInn],
+    text: "You are in the Town square."
+  },
+  {
+    id: 9,
+    name: "inn",
+    "button text": ["Buy room for a night (" + roomCost + " gold)", "Talk to the owner", "Go to Town square"],
+    "button functions": [buyRoom, talkInn, goTown],
+    text: "You enter the inn. You see an old sturdy man sitting at the desk right next to the entrance. You look at the ledger at his desk and see that there are available rooms left. A good night sleep would probably restore most of your health."
+  },
+  {
+    id: 10,
+    name: "talk inn",
+    "button text": ["Ask about monsters", "Praise his inn", "Go back"],
+    "button functions": [askMonsters, praiseInn, goInn],
+    text: "You approach the man who turned out to be an owner. He looks at you with a friendly smile. \"Hello, traveller! You sure look tired! Feel free to buy a room at my precious inn!\" "
+  },
+  {
+    id: 11,
+    name: "explore",
+    "button text": ["Go to the cave", "Go to Town", "Go to the goblin camp"],
+    "button functions": [goCave, goTown, fightDragon],
+    text: "You go through the main gates and stand on the road. Which way will you go?"
   }
 ]
 
@@ -78,15 +120,15 @@ const monsters = [
   {
     name: "Slime",
     level: 2,
-    hp: 15
+    hp: 25
   },
   {
-    name: "Fanged beast",
+    name: "Goblin warrior",
     level: 8,
-    hp: 60
+    hp: 100
   },
   {
-    name: "Dragon",
+    name: "Goblin warlord",
     level: 20,
     hp: 300
   }
@@ -105,8 +147,8 @@ const monsterNameText = document.querySelector("#monsterName");
 const monsterHealthText = document.querySelector("#monsterHealth");
 
 button1.onclick = goStore;
-button2.onclick = goCave;
-button3.onclick = fightDragon;
+button2.onclick = goInn;
+button3.onclick = explore;
 inventoryButton.onclick = openInventory;
 
 function update(location) {
@@ -134,14 +176,60 @@ function closeInventory() {
   inventoryButton.onclick = openInventory;
 };
 
+function goInn(){
+  button3.style.display = "block";
+  update(locations1[9]);
+}
+
+function buyRoom() {
+  if (gold >= roomCost) {
+    gold -= roomCost;
+    health = maxHealth;
+    goldText.innerText = gold;
+    healthText.innerText = health;
+    text.innerText = "You feel fully rested!";
+  }
+  else {
+    text.innerText = "You don't have enough money";
+  }
+};
+
+
+
+function talkInn() {
+  update(locations1[10]);
+}
+
+function askMonsters() {
+  if (askFlag == false){
+    text.innerText = "Oh, yes, we do have problems with monsters. These damn goblins keep raiding caravans transporting goods to our town and attacking people who wander too far outside town. Killing their leader would probably stop their tyranny but no one knows where his base is. Anyway, you dont look like you are strong enugh to defeat him right now. However, you could help with other thing - there's a cave near the river villagers are taking water from and some people heard strange noises coming from there recently. You would realy help by investigating it because people are now afraid to come near that place. *You can now explore the cave.*";
+    askFlag = true;
+  } else {
+    text.innerText = "Unfortunately I don't have anything else to tell you.";
+  }
+};
+
+function praiseInn() {
+  if (flatterFlag == false){
+    text.innerText = "Thank you, traveller. I can see you have a good taste. You know what? Let me give you a discount for that! *room price is reduced.*";
+    flatterFlag = true;
+    roomCost -= 10;
+  } else {
+    text.innerText = "You flatter me too much!";
+  }
+};
+
 function goStore() {
-  update(locations[1]);
+  button3.style.display = "block";
+  update(locations1[1]);
 };
 
 function buyHealth() {
   if (gold >= 10) {
     gold -= 10;
     health += 10;
+    maxHealth += 10;
+    roomCost += 10;
     goldText.innerText = gold;
     healthText.innerText = health;
     text.innerText = "Your health is increased!";
@@ -184,11 +272,25 @@ function sellWeapon() {
   }
 }
 function goTown() {
-  update(locations[0]);
+  monsterStats.style.display = "none";
+  if (askFlag == true){
+    button3.style.display = "block";
+    update(locations1[0]);
+  } else {
+    button3.style.display = "none";
+    update(locations1[8]);
+  }
 };
 
+function explore() {
+  if (campFlag == false) {
+    button3.style.display = "none";
+  }
+  update(locations1[11]);
+}
+
 function goCave() {
-  update(locations[2]);
+  update(locations1[2]);
 };
 
 function fightSlime() {
@@ -207,7 +309,7 @@ function fightDragon() {
 };
 
 function goFight() {
-  update(locations[3]);
+  update(locations1[3]);
   monsterHealth = monsters[fighting].hp;
   monsterStats.style.display = "block";
   monsterNameText.innerText = monsters[fighting].name;
@@ -238,8 +340,10 @@ function attack() {
     lose();
   } else if (monsterHealth <= 0) {
     defeatMonster();
-    if (monsters[fighting].name == "Dragon") {
+    if (monsters[fighting].name == "Goblin warlord") {
       victory();
+    } else if (monsters[fighting].name == "Goblin warrior"){
+      campFlag = true;
     }
   }
 };
@@ -270,7 +374,8 @@ function dodge() {
 };
 
 function defeatMonster() {
-  update(locations[4]);
+  button3.style.display = "block";
+  update(locations1[4]);
   text.innerText = "You have defeated " + monsters[fighting].name + " ! Now you can go back to Town square and mend your wounds."
   monsterStats.style.display = "none";
   gold += Math.floor(monsters[fighting].level * 6.7);
@@ -280,7 +385,7 @@ function defeatMonster() {
 };
 
 function lose() {
-  update(locations[6]);
+  update(locations1[6]);
   monsterStats.style.display = "none";
   gold = 0;
   health = 0;
@@ -291,19 +396,28 @@ function lose() {
 };
 
 function restart() {
-  update(locations[0]);
+  update(locations1[8]);
   gold = 50;
   health = 100;
+  xp = 0;
   healthText.innerText = health;
   goldText.innerText = gold;
+  xpText.innerText = xp;
+  maxhealth = 100;
+  currentWeapon = 0;
+  inventory = ["stick"];
+  flatterFlag = false;
+  roomCost = 50;
+  campFlag = false;
+  askFlag = false;
 };
 
 function victory() {
-  update(locations[5]);
+  update(locations1[5]);
 };
 
 function easterEgg(){
-  update(locations[7]);
+  update(locations1[7]);
 }
 
 function pickTwo() {

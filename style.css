@@ -17,6 +17,10 @@ body {
   padding: 10px;
 }
 
+#button3 {
+  display: none;
+}
+
 #controls, #inventory {
   border: 1px black solid;
   padding: 5px;
@@ -39,3 +43,4 @@ body {
 .stat {
   padding-right: 10px;
 }
+
